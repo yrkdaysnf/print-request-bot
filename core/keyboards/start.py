@@ -30,4 +30,4 @@ admin_keyboard = ReplyKeyboardMarkup(keyboard=[
             text='Статус принтера'
         )
     ]
-])
+],resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Что будем делать?', selective=True)
