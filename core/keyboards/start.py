@@ -3,10 +3,10 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 main_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
         KeyboardButton(
-            text= '💳 Пополнить баланс'
+            text= '💳 Баланс'
         ),
         KeyboardButton(
-            text='🧭 Проверка статуса печати'
+            text='🧭 Статус'
         )
     ],
     [
@@ -30,4 +30,4 @@ admin_keyboard = ReplyKeyboardMarkup(keyboard=[
             text='Статус принтера'
         )
     ]
-],resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Что будем делать?', selective=True)
+],resize_keyboard=True, input_field_placeholder='Что будем делать?')

@@ -6,15 +6,15 @@ async def commands(bot: Bot):
     commands = [
         BotCommand(
             command='start',
-            description='Начало работы'
+            description='Начало работы.'
         ),
         BotCommand(
             command='help',
-            description='Помощь'
+            description='Как пользоваться?'
         ),
         BotCommand(
             command='about',
-            description='О боте'
+            description='О боте и его авторе.'
         )
     ]
     await bot.set_my_commands(commands, BotCommandScopeDefault())

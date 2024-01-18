@@ -30,9 +30,22 @@ async def create_user(user_id, username):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
 
-    user = cur.execute("SELECT 1 FROM users WHERE user_id == ?", (user_id,)).fetchone()
-    if not user:
-        cur.execute("INSERT INTO users (user_id, username) VALUES(?,?)",(user_id, username))
-    
-    db.commit()
+    user = cur.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,)).fetchone()
+    if user:
+        if user[0] != username:
+            cur.execute("UPDATE users SET username = ? WHERE user_id = ?", (username, user_id))
+            db.commit()
+    else:
+        cur.execute("INSERT INTO users (user_id, username) VALUES (?, ?)", (user_id, username))
+        db.commit()
     db.close()
+
+async def get_balance(user_id):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT balance FROM users WHERE user_id = ?",(user_id,))
+        balance = cur.fetchone()
+        return balance[0]
+    finally:
+        db.close()
