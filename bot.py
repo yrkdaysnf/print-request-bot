@@ -3,6 +3,7 @@ from dotenv import dotenv_values
 from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message
 from aiogram.filters import Command, CommandObject
+from core.data.sql import db_start
 from core.handlers.basic import get_start, echo
 #from core.util.commands import commands
 #from core.middlewares.printernotwork import CounterMiddleware
@@ -18,6 +19,7 @@ dp = Dispatcher()
 
 async def start_bot(bot: Bot):
     #await commands(bot)
+    await db_start()
     await bot.send_message(ADMIN,text='Запуск',disable_notification=True)
 
 async def stop_bot(bot: Bot):
