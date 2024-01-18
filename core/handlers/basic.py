@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import Message
 from core.keyboards.start import main_keyboard
-from core.data.sql import create_user, edit_user
+from core.data.sql import create_user
 
 
 async def get_start(message: Message, bot = Bot):
