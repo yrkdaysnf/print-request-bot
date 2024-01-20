@@ -1,20 +1,22 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import dotenv_values as dv
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-PAY_URL = dv('.env')['PAY_URL']
+cash_inline = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(
+            text='Пополнить',
+            callback_data='cash'
+        )
+    ]
+]
+)
 
 pay_inline = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(
-            text='По ссылке',
-            url=PAY_URL
-        )
-    ],
-    [
-        InlineKeyboardButton(
-            text='По QR коду',
-            callback_data='qrcode'
+            text='Оплатить',
+            url=dv('.env')['PAY_URL']
         )
     ]
 ]

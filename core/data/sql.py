@@ -9,7 +9,7 @@ async def db_start():
                 CREATE TABLE IF NOT EXISTS users(
                 user_id INTEGER PRIMARY KEY, 
                 username TEXT,
-                balance REAL DEFAULT 0.0
+                balance REAL DEFAULT 0
                 )
                 ''')
     # Создание таблицы для файлов

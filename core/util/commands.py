@@ -1,5 +1,7 @@
+import os
 from aiogram import Bot
-from aiogram.types import BotCommand, BotCommandScopeDefault
+from aiogram.types import BotCommand, BotCommandScopeDefault, Message
+from core.keyboards.start import main_keyboard, admin_keyboard
 
 
 async def commands(bot: Bot):
@@ -18,3 +20,9 @@ async def commands(bot: Bot):
         )
     ]
     await bot.set_my_commands(commands, BotCommandScopeDefault())
+
+def adminoruser(id):
+    if id == int(os.getenv('ADMIN_ID')):
+        return admin_keyboard
+    else:
+        return main_keyboard
