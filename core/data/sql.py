@@ -49,3 +49,14 @@ async def get_balance(user_id):
         return balance[0]
     finally:
         db.close()
+
+async def get_all_users():
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+
+    try:
+        cur.execute("SELECT user_id, username, balance FROM users")
+        result = cur.fetchall()
+        return result
+    finally:
+        db.close()

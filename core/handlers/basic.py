@@ -1,9 +1,16 @@
 from aiogram import Bot
 from aiogram.types import Message
-from core.data.sql import create_user
-from core.util.commands import adminoruser
+from core.data.sql import create_user, db_start
+from core.util.commands import adminoruser, commands
 
 
+async def start_bot(bot: Bot):
+    await commands(bot)
+    await db_start()
+    print('Start')
+
+async def stop_bot(bot: Bot):
+    print('Stop')
 
 async def get_start(message: Message, bot = Bot):
         await create_user(user_id=message.from_user.id, username=message.from_user.username)
