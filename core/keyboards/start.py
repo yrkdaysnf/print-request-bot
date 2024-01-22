@@ -14,7 +14,7 @@ main_keyboard = ReplyKeyboardMarkup(keyboard=[
             text='🎁 Отправить файлы на печать'
         )
     ]
-], resize_keyboard=True, one_time_keyboard=True, input_field_placeholder='Что будем делать?', selective=True)
+], resize_keyboard=True, one_time_keyboard=True, is_persistent=True, input_field_placeholder='Что будем делать?')
 
 admin_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
@@ -30,4 +30,4 @@ admin_keyboard = ReplyKeyboardMarkup(keyboard=[
             text='Статус принтера'
         )
     ]
-],resize_keyboard=True, input_field_placeholder='Что будем делать?')
+],resize_keyboard=True, input_field_placeholder='Что будем делать?', one_time_keyboard=True, is_persistent=True)
