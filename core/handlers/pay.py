@@ -1,6 +1,6 @@
 from aiogram import Bot
-from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaPhoto
-from core.keyboards.inline import pay_inline, cash_inline
+from aiogram.types import Message, FSInputFile
+from core.keyboards.inline import cash_inline
 from core.data.sql import get_balance
 
 
