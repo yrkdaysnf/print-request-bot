@@ -26,7 +26,7 @@ async def db_start():
     db.commit()
     db.close()
 
-async def create_user(user_id, username):
+async def create_user(user_id:int, username:str):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
 
@@ -40,7 +40,7 @@ async def create_user(user_id, username):
         db.commit()
     db.close()
 
-async def get_balance(user_id):
+async def get_balance(user_id:int):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
     try:
@@ -50,13 +50,29 @@ async def get_balance(user_id):
     finally:
         db.close()
 
+async def get_username(user_id:int):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT username FROM users WHERE user_id = ?",(user_id,))
+        username = cur.fetchone()
+        return username[0]
+    finally:
+        db.close()
+
 async def get_all_users():
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
-
     try:
         cur.execute("SELECT user_id, username, balance FROM users")
         result = cur.fetchall()
         return result
     finally:
         db.close()
+
+async def edit_user_balance(user_id: int, new_balance: float):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    cur.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
+    db.commit()
+    db.close()
