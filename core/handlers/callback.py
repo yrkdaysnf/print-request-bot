@@ -1,17 +1,18 @@
+import os
 from aiogram import Bot
-from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaPhoto
-from core.data.sql import get_all_users
-from core.keyboards.inline import pay_inline
+from aiogram.types import CallbackQuery, FSInputFile, InputMediaPhoto
+from core.keyboards.inline import pay_inline, cash_inline
+from aiogram.enums import ParseMode
 
-
-async def backcall(call:CallbackQuery, bot:Bot, message:Message):
-
-    for user in await get_all_users():
-        user_id, username, balance = user
-        if call.data == f'id:balance:{user_id}':
-            text = f'Выбран пользователь @{username}, его баланс {balance}₽\n Что будем делать?'
-            await bot.message.answer(text, reply_markup=None)
+async def backcall(call:CallbackQuery, bot:Bot):
+    # for user in await get_all_users():
+    #     user_id, username, balance = user
+    #     if call.data == f'id:balance:{user_id}':
+    #         text = f'Пользователь @{username}\nБаланс {balance}₽ Что будем делать?'
+    #         await call.message.edit_text(text, reply_markup=cash_inline)
 
     if call.data == 'cash':
-        await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\files\\resources\\qr-code.jpg')),
-                                    reply_markup=pay_inline)
+        if call.message.from_user.id != int(os.getenv('ADMIN_ID')):
+            text = '`Совет:\nУказывайте Ваш @username при оплате.\nЭто ускорит обработку пополнения.`'
+            await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\files\\resources\\qr-code.jpg'),
+                                                        caption=text, parse_mode=ParseMode.MARKDOWN_V2), reply_markup=pay_inline)
