@@ -13,5 +13,5 @@ async def backcall(call:CallbackQuery, bot:Bot, message:Message):
             await bot.message.answer(text, reply_markup=None)
 
     if call.data == 'cash':
-        await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\file\\resourses\\qr-code.jpg')),
+        await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\files\\resources\\qr-code.jpg')),
                                     reply_markup=pay_inline)
