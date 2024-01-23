@@ -1,4 +1,5 @@
 import sqlite3 as sq
+from datetime import datetime
 
 async def db_start():
     db = sq.connect('core\\data\\database.sql')
@@ -18,8 +19,8 @@ async def db_start():
                 file_id INTEGER PRIMARY KEY, 
                 user_id INTEGER, 
                 date_sent TEXT,
-                status TEXT,
                 price INTEGER,
+                status TEXT DEFAULT queue,
                 FOREIGN KEY (user_id) REFERENCES users(user_id)
                 )
                 ''')
@@ -74,5 +75,13 @@ async def edit_user_balance(user_id: int, new_balance: float):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
     cur.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
+    db.commit()
+    db.close()
+
+async def create_file(file_id, user_id, price):
+    date_sent = datetime.now().strftime('%H:%M %d.%m.%Y')
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    cur.execute("INSERT INTO files (user_id, date_sent, price) VALUES (?, ?, ?)", (user_id, date_sent, price))
     db.commit()
     db.close()
