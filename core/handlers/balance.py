@@ -4,7 +4,7 @@ from aiogram.filters import CommandObject
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from core.data.sql import get_all_users, edit_user_balance, get_balance, get_username
 from aiogram.enums import ParseMode
-from core.util.commands import is_admin
+from core.util.check import is_admin
 
 # async def listofusers(message:Message, bot:Bot):  
 #     list_users = InlineKeyboardBuilder()
@@ -36,7 +36,7 @@ async def edit_balance(message:Message, command:CommandObject, bot:Bot):
         username = await get_username(user_id)
         new_balance = round(await get_balance(user_id) + float(data[1]),2)
         await edit_user_balance(user_id, new_balance)
-        await message.reply(f'Баланс для @{username} изменён {data[1]}₽!\
+        await message.reply(f'Баланс для @{username} изменён на {data[1]}₽!\
                             \nТекущий баланс: {new_balance}₽')
         await bot.send_message(user_id,text=f'<i>Ваш баланс изменён!\
                                \nТекущий баланс: {new_balance}₽</i>', parse_mode=ParseMode.HTML)
