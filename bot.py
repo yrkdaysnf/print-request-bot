@@ -6,6 +6,7 @@ from core.handlers.basic import get_start, echo, start_bot, stop_bot
 from core.handlers.pay import wannapay
 from core.handlers.balance import listofusers, edit_balance
 from core.handlers.callback import backcall
+from core.handlers.files import sendfileinfo, sendfile
 
 
 ld()
@@ -21,10 +22,13 @@ dp = Dispatcher()
 async def main():
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
-    dp.message.register(get_start, Command('start'), F.text.lower == 'старт')
-    dp.message.register(edit_balance, Command('b'))
+    dp.message.register(get_start, Command('start'))
+    dp.message.register(edit_balance, Command('b', 'balance'))
+   # dp.message.register(sendfile, Command('s', 'send'))
+    dp.message.register(sendfile, F.document)
     dp.message.register(wannapay, F.text == '💳 Баланс')
     dp.message.register(listofusers, F.text == '💳 Баланс пользователей')
+    dp.message.register(sendfileinfo, F.text == '🎁 Отправить файлы на печать')
     dp.callback_query.register(backcall)
     dp.message.register(echo)
     try:
