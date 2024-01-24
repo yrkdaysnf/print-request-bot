@@ -78,10 +78,10 @@ async def edit_user_balance(user_id: int, new_balance: float):
     db.commit()
     db.close()
 
-async def create_file(file_id, user_id, price):
+async def create_file(file_id: str, user_id: int, price: float):
     date_sent = datetime.now().strftime('%H:%M %d.%m.%Y')
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
-    cur.execute("INSERT INTO files (user_id, date_sent, price) VALUES (?, ?, ?)", (user_id, date_sent, price))
+    cur.execute("INSERT INTO files (file_id ,user_id, date_sent, price) VALUES (?, ?, ?, ?)", (file_id ,user_id, date_sent, price))
     db.commit()
     db.close()
