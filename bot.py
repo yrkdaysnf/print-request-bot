@@ -24,11 +24,10 @@ async def main():
     dp.shutdown.register(stop_bot)
     dp.message.register(get_start, Command('start'))
     dp.message.register(edit_balance, Command('b', 'balance'))
-   # dp.message.register(sendfile, Command('s', 'send'))
     dp.message.register(sendfile, F.document)
     dp.message.register(wannapay, F.text == '💳 Баланс')
     dp.message.register(listofusers, F.text == '💳 Баланс пользователей')
-    dp.message.register(sendfileinfo, F.text == '🎁 Отправить файлы на печать')
+    dp.message.register(sendfileinfo, Command('help'))
     dp.callback_query.register(backcall)
     dp.message.register(echo)
     try:

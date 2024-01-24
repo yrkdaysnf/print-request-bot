@@ -1,7 +1,5 @@
 aiogram
 python-dotenv
-opencv-python
-pypdf
 docx2pdf
 pdf2image
 img2pdf

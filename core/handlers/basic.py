@@ -18,11 +18,17 @@ async def get_start(message: Message, bot = Bot):
     if is_admin(message.from_user.id) == True: keyboard = admin_keyboard
     else: keyboard = main_keyboard
     await create_user(user_id=message.from_user.id, username=message.from_user.username)
-    await message.answer(f'''Здравствуйте, {message.from_user.first_name}.
+    await message.answer(
+f'''Здравствуйте, {message.from_user.first_name}!
 Добро пожаловать в систему автоматизированной печати!
-Для продолжения, нажмите на интересующую кнопоку''', reply_markup=keyboard)
+Для продолжения, воспользуйтесь кнопками ниже или оптравьте файл.''', reply_markup=keyboard)
 
 async def echo(message:Message):
     if is_admin(message.from_user.id) == True: keyboard = admin_keyboard
     else: keyboard = main_keyboard
-    await message.reply('Я не знаю такой команды 🥺', reply_markup=keyboard)
+    await message.reply('Я не знаю такой команды 🥺\nИли она на стадии разработки.', reply_markup=keyboard)
+
+
+#     await message.answer(f'''Здравствуйте, {message.from_user.first_name}.
+# Добро пожаловать в систему автоматизированной печати!
+# Для продолжения, нажмите на интересующую кнопоку''', reply_markup=keyboard)

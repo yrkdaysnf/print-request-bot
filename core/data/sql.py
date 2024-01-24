@@ -16,8 +16,8 @@ async def db_start():
     # Создание таблицы для файлов
     cur.execute(
                 '''CREATE TABLE IF NOT EXISTS files(
-                file_id INTEGER PRIMARY KEY, 
-                user_id INTEGER, 
+                file_id TEXT PRIMARY KEY, 
+                user_id INTEGER,
                 date_sent TEXT,
                 price INTEGER,
                 status TEXT DEFAULT queue,
