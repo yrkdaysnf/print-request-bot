@@ -5,8 +5,9 @@ from aiogram.filters import Command
 from core.handlers.basic import get_start, echo, start_bot, stop_bot
 from core.handlers.pay import wannapay
 from core.handlers.balance import listofusers, edit_balance
-from core.handlers.callback import backcall
+from core.handlers.callback import backcall, get_comment
 from core.handlers.files import sendfileinfo, sendfile
+from core.util.statesform import Comment
 
 
 ld()
@@ -22,6 +23,7 @@ dp = Dispatcher()
 async def main():
     dp.startup.register(start_bot)
     dp.shutdown.register(stop_bot)
+    dp.message.register(get_comment, Comment.COMMENT)
     dp.message.register(get_start, Command('start'))
     dp.message.register(edit_balance, Command('b', 'balance'))
     dp.message.register(sendfile, F.document)

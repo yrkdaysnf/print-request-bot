@@ -8,19 +8,22 @@ async def db_start():
     # Создание таблицы для пользователей
     cur.execute('''
                 CREATE TABLE IF NOT EXISTS users(
-                user_id INTEGER PRIMARY KEY, 
+                user_id INTEGER, 
                 username TEXT,
-                balance REAL DEFAULT 0
+                balance REAL DEFAULT 0,
+                PRIMARY KEY("user_id")
                 )
                 ''')
     # Создание таблицы для файлов
     cur.execute(
                 '''CREATE TABLE IF NOT EXISTS files(
-                file_id TEXT PRIMARY KEY, 
+                unique_id TEXT,
+                file_id TEXT,
                 user_id INTEGER,
                 date_sent TEXT,
                 price INTEGER,
                 status TEXT DEFAULT queue,
+                PRIMARY KEY("unique_id"),
                 FOREIGN KEY (user_id) REFERENCES users(user_id)
                 )
                 ''')
@@ -30,7 +33,6 @@ async def db_start():
 async def create_user(user_id:int, username:str):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
-
     user = cur.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,)).fetchone()
     if user:
         if user[0] != username:
@@ -65,7 +67,7 @@ async def get_all_users():
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
     try:
-        cur.execute("SELECT user_id, username, balance FROM users")
+        cur.execute("SELECT * FROM users")
         result = cur.fetchall()
         return result
     finally:
@@ -78,10 +80,47 @@ async def edit_user_balance(user_id: int, new_balance: float):
     db.commit()
     db.close()
 
-async def create_file(file_id: str, user_id: int, price: float):
+async def create_file(unique_id: str, file_id: str, user_id: int, price: float):
     date_sent = datetime.now().strftime('%H:%M %d.%m.%Y')
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
-    cur.execute("INSERT INTO files (file_id ,user_id, date_sent, price) VALUES (?, ?, ?, ?)", (file_id ,user_id, date_sent, price))
+    cur.execute("INSERT INTO files (unique_id, file_id ,user_id, date_sent, price) VALUES (?, ?, ?, ?, ?)", (unique_id, file_id ,user_id, date_sent, price))
     db.commit()
     db.close()
+
+async def edit_file_status(unique_id: str, new_status: str):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    cur.execute("UPDATE files SET status=? WHERE unique_id=?", (new_status, unique_id))
+    db.commit()
+    db.close()
+
+async def get_fileinfo(unique_id:str):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT file_id, user_id, date_sent, price, status FROM files WHERE unique_id=?", (unique_id,))
+        fileinfo = cur.fetchone()
+        return fileinfo
+    finally:
+        db.close()
+
+async def get_all_files_in_status(status):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT unique_id, user_id FROM files WHERE status = ?",(status,))
+        result = cur.fetchall()
+        return result
+    finally:
+        db.close()
+
+async def get_all_myfiles(user_id):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    try:
+        cur.execute("SELECT unique_id, file_id, status FROM files WHERE user_id = ?",(user_id,))
+        result = cur.fetchall()
+        return result
+    finally:
+        db.close()
