@@ -21,9 +21,23 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
         await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\files\\resources\\qr-code.jpg'),
                                         caption=text, parse_mode=ParseMode.MARKDOWN_V2), reply_markup=pay_inline)
     
+    if call.data == 'file:adminprint':
+        fileinfo = await get_fileinfo(call.message.document.file_unique_id)
+        await edit_file_status(call.message.document.file_unique_id,'printed')
+        await bot.send_document(fileinfo[1],call.message.document.file_id,
+                                caption='<i>Файл напечатан!</i>',
+                                parse_mode=ParseMode.HTML)
+        await call.message.edit_caption(caption=f'<i>Файл напечатан!</i>', 
+                                reply_markup = None,
+                                parse_mode=ParseMode.HTML)
+
+
     if call.data.startswith('delete:'):
         if call.data == 'delete:accept':
             comment = await state.get_data()
+            comment = comment.get("comment")
+            if comment is None:
+                comment = '<code>Не указано</code>'
             fileinfo = await get_fileinfo(call.message.document.file_unique_id)
             await edit_file_status(call.message.document.file_unique_id,'canceled')
             await edit_user_balance(fileinfo[1],round(await get_balance(fileinfo[1])+fileinfo[3],2))
@@ -32,7 +46,9 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
                                     \nЗатраченные средства возвращенны.\n\
                                     \n<b>Причина отмены:</b>\n<i>{comment.get("comment")}</i>',
                                     parse_mode=ParseMode.HTML)
-            await call.message.delete()
+            await call.message.edit_caption(caption=f'<i>Файл снят с очереди на печать!</i>', 
+                                reply_markup = None,
+                                parse_mode=ParseMode.HTML)
             await state.clear()
         else:
             await state.clear()
@@ -68,6 +84,8 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
             if fileinfo[4] == 'queue':
                 await edit_file_status(call.message.document.file_unique_id,'canceled')
                 await edit_user_balance(fileinfo[1],round(await get_balance(fileinfo[1])+fileinfo[3],2))
+                await call.message.edit_caption(caption=f'<i>Файл снят с очереди на печать!</i>',
+                                parse_mode=ParseMode.HTML, reply_markup=cancel)
                 await call.message.delete_reply_markup()
                 await call.answer('Файл снят с очереди на печать!')
             elif fileinfo[4] == 'done':
@@ -87,7 +105,7 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
                 await create_file(call.message.document.file_unique_id, call.message.document.file_id, call.from_user.id, price)
                 await edit_user_balance(call.from_user.id, round(balance-price, 2))
                 await call.answer('Файл принят в очередь на печать!')
-                await call.message.edit_caption(caption=f'<i>Файл успешно принят в очередь на печать!</i>',
+                await call.message.edit_caption(caption=f'<i>Файл принят в очередь на печать!</i>',
                                 parse_mode=ParseMode.HTML, reply_markup=cancel)
                 await asyncio.sleep(900)
                 fileinfo = await get_fileinfo(call.message.document.file_unique_id)
