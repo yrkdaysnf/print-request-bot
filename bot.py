@@ -6,6 +6,8 @@ from core.handlers.basic import get_start, echo, start_bot, stop_bot
 from core.handlers.pay import wannapay
 from core.handlers.balance import listofusers, edit_balance
 from core.handlers.callback import backcall, get_comment
+from core.handlers.filelist import myfilelist, fileinqueue
+from core.handlers.status import edit_status, statusinfo
 from core.handlers.files import sendfileinfo, sendfile
 from core.util.statesform import Comment
 
@@ -26,9 +28,13 @@ async def main():
     dp.message.register(get_comment, Comment.COMMENT)
     dp.message.register(get_start, Command('start'))
     dp.message.register(edit_balance, Command('b', 'balance'), F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(edit_status, Command('s', 'status'), F.from_user.id==int(os.getenv('ADMIN_ID')))
     dp.message.register(sendfile, F.document)
     dp.message.register(wannapay, F.text == '💳 Баланс')
+    dp.message.register(myfilelist, F.text == '📂 Мои файлы')
     dp.message.register(listofusers, F.text == '💳 Баланс пользователей', F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(fileinqueue, F.text == '🧭 Файлы в очереди', F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(statusinfo, F.text == '🖨 Принтер', F.from_user.id==int(os.getenv('ADMIN_ID')))
     dp.message.register(sendfileinfo, Command('help'))
     dp.callback_query.register(backcall)
     dp.message.register(echo)

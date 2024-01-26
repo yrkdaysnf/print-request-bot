@@ -21,16 +21,55 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
         await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\files\\resources\\qr-code.jpg'),
                                         caption=text, parse_mode=ParseMode.MARKDOWN_V2), reply_markup=pay_inline)
     
+    if call.data.startswith('myfile:'):
+        unique_id = call.data.split(':')[1]
+        try:
+            fileinfo = await get_fileinfo(unique_id)
+            if fileinfo[4] == 'queue':
+                await bot.send_document(fileinfo[1],fileinfo[0],
+                                caption='<i>Файл ожидает печати.</i>',
+                                parse_mode=ParseMode.HTML, reply_markup=cancel)
+            elif fileinfo[4] == 'done':
+                await bot.send_document(fileinfo[1],fileinfo[0],
+                                caption='<i>Файл напечатан!</i>',
+                                parse_mode=ParseMode.HTML)                
+            elif fileinfo[4] == 'canceled':
+                await bot.send_document(fileinfo[1],fileinfo[0],
+                                caption='<i>Файл снят с очереди на печать!</i>',
+                                parse_mode=ParseMode.HTML)                
+        except:
+            await call.answer('Файла не существует...')
+    
+    if call.data.startswith('userfile:'):
+        unique_id = call.data.split(':')[1]
+        try:
+            fileinfo = await get_fileinfo(unique_id)
+            if fileinfo[4] == 'queue':
+                await bot.send_document(os.getenv('ADMIN_ID'), fileinfo[0], 
+                                caption=f'<i>От пользователя @{await get_username(fileinfo[1])}\
+                                \n Дата: <code>{fileinfo[2]}</code></i>',
+                                parse_mode=ParseMode.HTML, reply_markup=cancelorprint)
+            elif fileinfo[4] == 'done':
+                await bot.send_document(os.getenv('ADMIN_ID'),fileinfo[0],
+                                caption='<i>Файл напечатан!</i>',
+                                parse_mode=ParseMode.HTML)                
+            elif fileinfo[4] == 'canceled':
+                await bot.send_document(os.getenv('ADMIN_ID'),fileinfo[0],
+                                caption='<i>Файл снят с очереди на печать!</i>',
+                                parse_mode=ParseMode.HTML)                
+        except:
+            await call.answer('Файла не существует...')
+
     if call.data == 'file:adminprint':
         fileinfo = await get_fileinfo(call.message.document.file_unique_id)
-        await edit_file_status(call.message.document.file_unique_id,'printed')
+        await edit_file_status(call.message.document.file_unique_id,'done')
         await bot.send_document(fileinfo[1],call.message.document.file_id,
                                 caption='<i>Файл напечатан!</i>',
                                 parse_mode=ParseMode.HTML)
-        await call.message.edit_caption(caption=f'<i>Файл напечатан!</i>', 
+        await call.message.edit_caption(
+                                caption=f'<i>Файл напечатан!</i>', 
                                 reply_markup = None,
                                 parse_mode=ParseMode.HTML)
-
 
     if call.data.startswith('delete:'):
         if call.data == 'delete:accept':
@@ -44,7 +83,7 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
             await bot.send_document(fileinfo[1],call.message.document.file_id,
                                     caption=f'Файл снят с очереди на печать!\
                                     \nЗатраченные средства возвращенны.\n\
-                                    \n<b>Причина отмены:</b>\n<i>{comment.get("comment")}</i>',
+                                    \n<b>Причина отмены:</b>\n<i>{comment}</i>',
                                     parse_mode=ParseMode.HTML)
             await call.message.edit_caption(caption=f'<i>Файл снят с очереди на печать!</i>', 
                                 reply_markup = None,
@@ -90,10 +129,12 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
                 await call.answer('Файл снят с очереди на печать!')
             elif fileinfo[4] == 'done':
                 await call.answer('Файл уже напечатан!')
-                await call.message.delete()
+                await call.message.edit_caption(caption=f'<i>Файл уже напечатан!</i>',
+                                parse_mode=ParseMode.HTML, reply_markup=None)
             elif fileinfo[4] == 'canceled':
                 await call.answer('Файл уже снят с очереди на печать!')
-                await call.message.delete_reply_markup()
+                await call.message.edit_caption(caption=f'<i>Файл уже снят с очереди на печать!</i>',
+                                parse_mode=ParseMode.HTML, reply_markup=None)
         except:
             await call.answer('Файла не существует...')
             
@@ -102,7 +143,10 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
             price = float(call.data.split(':')[2])
             balance = await get_balance(call.from_user.id)
             if round(balance-price, 2) > 0:
-                await create_file(call.message.document.file_unique_id, call.message.document.file_id, call.from_user.id, price)
+                await create_file(call.message.document.file_unique_id, 
+                                  call.message.document.file_id, 
+                                  call.from_user.id, price, 
+                                  call.message.document.file_name)
                 await edit_user_balance(call.from_user.id, round(balance-price, 2))
                 await call.answer('Файл принят в очередь на печать!')
                 await call.message.edit_caption(caption=f'<i>Файл принят в очередь на печать!</i>',
@@ -120,10 +164,3 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
         else:
             await call.message.delete()
             await call.answer('Сомнительно, но окэй 👌')
-        
-
-    # for user in await get_all_users():
-    #     user_id, username, balance = user
-    #     if call.data == f'id:balance:{user_id}':
-    #         text = f'Пользователь @{username}\nБаланс {balance}₽ Что будем делать?'
-    #         await call.message.edit_text(text, reply_markup=cash_inline)

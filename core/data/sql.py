@@ -23,6 +23,7 @@ async def db_start():
                 date_sent TEXT,
                 price INTEGER,
                 status TEXT DEFAULT queue,
+                file_name TEXT,
                 PRIMARY KEY("unique_id"),
                 FOREIGN KEY (user_id) REFERENCES users(user_id)
                 )
@@ -80,11 +81,11 @@ async def edit_user_balance(user_id: int, new_balance: float):
     db.commit()
     db.close()
 
-async def create_file(unique_id: str, file_id: str, user_id: int, price: float):
-    date_sent = datetime.now().strftime('%H:%M %d.%m.%Y')
+async def create_file(unique_id: str, file_id: str, user_id: int, price: float, file_name:str):
+    date_sent = datetime.now().strftime('%d.%m.%Y - %H:%M')
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
-    cur.execute("INSERT INTO files (unique_id, file_id ,user_id, date_sent, price) VALUES (?, ?, ?, ?, ?)", (unique_id, file_id ,user_id, date_sent, price))
+    cur.execute("INSERT INTO files (unique_id, file_id ,user_id, date_sent, price, file_name) VALUES (?, ?, ?, ?, ?, ?)", (unique_id, file_id ,user_id, date_sent, price, file_name))
     db.commit()
     db.close()
 
@@ -109,7 +110,7 @@ async def get_all_files_in_status(status):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
     try:
-        cur.execute("SELECT unique_id, user_id FROM files WHERE status = ?",(status,))
+        cur.execute("SELECT unique_id, user_id, date_sent, file_name FROM files WHERE status = ?",(status,))
         result = cur.fetchall()
         return result
     finally:
@@ -119,7 +120,7 @@ async def get_all_myfiles(user_id):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
     try:
-        cur.execute("SELECT unique_id, file_id, status FROM files WHERE user_id = ?",(user_id,))
+        cur.execute("SELECT unique_id, date_sent, status, file_name FROM files WHERE user_id = ?",(user_id,))
         result = cur.fetchall()
         return result
     finally:

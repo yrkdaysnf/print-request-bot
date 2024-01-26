@@ -1,20 +1,10 @@
 from aiogram import Bot
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 from aiogram.filters import CommandObject
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from core.data.sql import get_all_users, edit_user_balance, get_balance, get_username
 from aiogram.enums import ParseMode
-from core.util.check import is_admin
 
-# async def listofusers(message:Message, bot:Bot):  
-#     list_users = InlineKeyboardBuilder()
-#     users = await get_all_users()
-#     for user in users:
-#         user_id, username, balance = user
-#         list_users.button(text=f"@{username} - {balance}₽", callback_data=f"id:balance:{user_id}")
-#     list_users.adjust(1)
-
-#     await message.answer('*Список пользователей:*', reply_markup=list_users.as_markup(), parse_mode=ParseMode.MARKDOWN_V2)
 
 async def listofusers(message:Message):
     users = await get_all_users()

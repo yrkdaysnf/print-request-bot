@@ -66,7 +66,26 @@ cancelordelete = InlineKeyboardMarkup(inline_keyboard=[
         InlineKeyboardButton(
             text='Продолжить',
             callback_data=f"delete:accept"
-        ),
+        )
     ]
+]
+)
+
+statuschange = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(
+                        text='Готовые',
+                        callback_data=f"statusfile:done"
+        ),
+        InlineKeyboardButton(
+                        text='Ожидают',
+                        callback_data=f"statusfile:queue"
+        ),
+        InlineKeyboardButton(
+                        text='Отменены',
+                        callback_data=f"statusfile:canceled"
+        )       
+    ]
+
 ]
 )
