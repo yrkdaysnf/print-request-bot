@@ -26,9 +26,4 @@ f'''Здравствуйте, {message.from_user.first_name}!
 async def echo(message:Message):
     if is_admin(message.from_user.id) == True: keyboard = admin_keyboard
     else: keyboard = main_keyboard
-    await message.reply('Я не знаю такой команды 🥺\nИли она на стадии разработки.', reply_markup=keyboard)
-
-
-#     await message.answer(f'''Здравствуйте, {message.from_user.first_name}.
-# Добро пожаловать в систему автоматизированной печати!
-# Для продолжения, нажмите на интересующую кнопоку''', reply_markup=keyboard)
+    await message.reply('Я не знаю такой команды 🥺', reply_markup=keyboard)
