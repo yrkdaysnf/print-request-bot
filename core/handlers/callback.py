@@ -4,8 +4,8 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaPhoto
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
-from core.keyboards.inline import pay_inline, cancel, cancelorprint, canceldelete, cancelordelete, statuschange
-from core.data.sql import create_file, create_user, get_balance, edit_user_balance, get_fileinfo, edit_file_status, get_username, get_all_files_in_status
+from core.keyboards.inline import pay_inline, cancel, cancelorprint, canceldelete, cancelordelete, statuschange, delete
+from core.data.sql import create_file, create_user, get_balance, edit_user_balance, get_fileinfo, delete_file, edit_file_status, get_username, get_all_files_in_status
 from core.util.statesform import Comment
 
 
@@ -23,15 +23,21 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
         msg = await call.message.edit_media(InputMediaPhoto(media = file,
                                         caption=text, parse_mode=ParseMode.MARKDOWN_V2), reply_markup=pay_inline)
     
+    if call.data == 'delete':
+        if await delete_file(call.message.document.file_unique_id) == 0:
+            await call.answer('Файл уже удалён из базы данных')
+        await call.answer('Файл удалён из базы данных')
+        await call.message.delete()
+        
     if call.data.startswith('statusfile:'):
         status = call.data.split(':')[1]
         list_files = InlineKeyboardBuilder()
         files = await get_all_files_in_status(status)
         if status == 'done': text1 = 'Напечатанные файлы'
         if status == 'queue': text1 = 'Файлы в очереди'
-        if status == 'canceled': text1 = 'Отмененнные файлы'
+        if status == 'canceled': text1 = 'Отмененные файлы'
         if files == []:
-            await call.message.edit_text(f'<i>{text1} отсутсвуют.</i>', parse_mode=ParseMode.HTML, reply_markup=statuschange)
+            await call.message.edit_text(f'<i>{text1} отсутствуют.</i>', parse_mode=ParseMode.HTML, reply_markup=statuschange)
         else:
             for file in files:
                 unique_id, user_id, date, file_name = file
@@ -69,11 +75,13 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
             elif fileinfo[4] == 'done':
                 await bot.send_document(fileinfo[1],fileinfo[0],
                                 caption='<i>Файл напечатан!</i>',
-                                parse_mode=ParseMode.HTML)                
+                                parse_mode=ParseMode.HTML,
+                                reply_markup=delete)                
             elif fileinfo[4] == 'canceled':
                 await bot.send_document(fileinfo[1],fileinfo[0],
                                 caption='<i>Файл снят с очереди на печать!</i>',
-                                parse_mode=ParseMode.HTML)                
+                                parse_mode=ParseMode.HTML,
+                                reply_markup=delete)                
         except:
             await call.answer('Файла не существует...')
     
@@ -119,7 +127,7 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
             await edit_user_balance(fileinfo[1],round(await get_balance(fileinfo[1])+fileinfo[3],2))
             await bot.send_document(fileinfo[1],call.message.document.file_id,
                                     caption=f'Файл снят с очереди на печать!\
-                                    \nЗатраченные средства возвращенны.\n\
+                                    \nЗатраченные средства возвращены.\n\
                                     \n<b>Причина отмены:</b>\n<i>{comment}</i>',
                                     parse_mode=ParseMode.HTML)
             await call.message.edit_caption(caption=f'<i>Файл снят с очереди на печать!</i>', 
@@ -161,17 +169,16 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
                 await edit_file_status(call.message.document.file_unique_id,'canceled')
                 await edit_user_balance(fileinfo[1],round(await get_balance(fileinfo[1])+fileinfo[3],2))
                 await call.message.edit_caption(caption=f'<i>Файл снят с очереди на печать!</i>',
-                                parse_mode=ParseMode.HTML, reply_markup=cancel)
-                await call.message.delete_reply_markup()
+                                parse_mode=ParseMode.HTML, reply_markup=delete)
                 await call.answer('Файл снят с очереди на печать!')
             elif fileinfo[4] == 'done':
                 await call.answer('Файл уже напечатан!')
                 await call.message.edit_caption(caption=f'<i>Файл уже напечатан!</i>',
-                                parse_mode=ParseMode.HTML, reply_markup=None)
+                                parse_mode=ParseMode.HTML, reply_markup=delete)
             elif fileinfo[4] == 'canceled':
                 await call.answer('Файл уже снят с очереди на печать!')
                 await call.message.edit_caption(caption=f'<i>Файл уже снят с очереди на печать!</i>',
-                                parse_mode=ParseMode.HTML, reply_markup=None)
+                                parse_mode=ParseMode.HTML, reply_markup=delete)
         except:
             await call.answer('Файла не существует...')
             

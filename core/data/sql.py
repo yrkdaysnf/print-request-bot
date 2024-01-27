@@ -123,3 +123,13 @@ async def get_all_myfiles(user_id):
         return result
     finally:
         db.close()
+
+async def delete_file(unique_id):
+    db = sq.connect('core\\data\\database.sql')
+    cur = db.cursor()
+    try:
+        cur.execute("DELETE FROM files WHERE unique_id = ?", (unique_id,))
+        db.commit()
+    finally:
+        db.close()
+        return cur.rowcount

@@ -57,6 +57,16 @@ canceldelete = InlineKeyboardMarkup(inline_keyboard=[
 ]
 )
 
+delete = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(
+            text='🔥 Удалить',
+            callback_data="delete"
+        )
+    ]
+]
+)
+
 cancelordelete = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(
