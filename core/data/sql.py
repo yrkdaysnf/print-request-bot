@@ -47,12 +47,10 @@ async def create_user(user_id:int, username:str):
 async def get_balance(user_id:int):
     db = sq.connect('core\\data\\database.sql')
     cur = db.cursor()
-    try:
-        cur.execute("SELECT balance FROM users WHERE user_id = ?",(user_id,))
-        balance = cur.fetchone()
-        return balance[0]
-    finally:
-        db.close()
+    cur.execute("SELECT balance FROM users WHERE user_id = ?",(user_id,))
+    balance = cur.fetchone()
+    db.close()
+    return balance[0]
 
 async def get_username(user_id:int):
     db = sq.connect('core\\data\\database.sql')

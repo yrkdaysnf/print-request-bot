@@ -9,15 +9,6 @@ from docx2pdf import convert as d2p
 
 
 ALLOWED_EXTENSIONS = {'.pdf', '.doc', '.docx'}
-
-async def sendfileinfo(message:Message, bot:Bot):
-    await bot.send_photo(message.chat.id,FSInputFile('core\\data\\files\\resources\\start.jpg'),caption=
-f'Для создания заявки на печать, просто отправьте файл.\n\
-\n<i>Принимаемые расширения:</i>\n<code>.pdf .doc .docx</code>\n\
-\nПосле отправки потребуется некоторое время для расчета итоговой стоимости,\
-далее вам предложит подтвердить создание новой задачи печати.', 
-parse_mode=ParseMode.HTML)
-
 async def sendfile(message:Message, bot:Bot):
     if message.document.file_size <= 10485760:
         name, ext = os.path.splitext(message.document.file_name)

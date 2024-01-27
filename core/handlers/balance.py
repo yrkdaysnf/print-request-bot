@@ -28,8 +28,8 @@ async def edit_balance(message:Message, command:CommandObject, bot:Bot):
         await edit_user_balance(user_id, new_balance)
         await message.reply(f'Баланс для @{username} изменён на {data[1]}₽!\
                             \nТекущий баланс: {new_balance}₽')
-        await bot.send_message(user_id,text=f'<i>Ваш баланс был изменён на {data[1]}₽!\
-                               \nТекущий баланс: {new_balance}₽</i>', parse_mode=ParseMode.HTML)
+        await bot.send_message(user_id,text=f'<i>Ваш баланс был изменён на {data[1]}</i>₽<i>!\
+                               \nТекущий баланс: {new_balance}</i>₽', parse_mode=ParseMode.HTML)
     except TypeError as e:
         await message.reply(f'Ошибка типа данных: {e}')
     except ValueError as e:

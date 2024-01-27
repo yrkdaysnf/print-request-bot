@@ -1,6 +1,5 @@
 from aiogram import Bot
 from aiogram.types import Message
-from aiogram.filters import CommandObject
 from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
 from aiogram.enums import ParseMode
 from core.keyboards.inline import statuschange
@@ -52,4 +51,4 @@ async def fileinqueue(message:Message):
                         callback_data=f"statusfile:canceled"
                         )
         )
-        await message.answer('<i>Список файлов в очереди:</i>', reply_markup=list_files.as_markup(), parse_mode=ParseMode.HTML)
+        await message.answer('<i>Файлы в очереди:</i>', reply_markup=list_files.as_markup(), parse_mode=ParseMode.HTML)
