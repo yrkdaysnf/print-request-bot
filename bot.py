@@ -2,14 +2,15 @@ import logging, asyncio, os, datetime
 from dotenv import load_dotenv as ld
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
-from core.handlers.basic import get_start, echo, start_bot, stop_bot
-from core.handlers.pay import wannapay
+from core.util.statesform import Comment
+from core.handlers.basic import get_start, echo, start_bot, stop_bot, printer
 from core.handlers.balance import listofusers, edit_balance
-from core.handlers.callback import backcall, get_comment
 from core.handlers.filelist import myfilelist, fileinqueue
 from core.handlers.status import edit_status, statusinfo
-from core.handlers.files import sendfileinfo, sendfile
-from core.util.statesform import Comment
+from core.handlers.callback import backcall, get_comment
+from core.data.files.resources.info import help, about
+from core.handlers.files import sendfile
+from core.handlers.pay import wannapay
 
 
 ld()
@@ -23,21 +24,23 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 async def main():
-    dp.startup.register(start_bot)
-    dp.shutdown.register(stop_bot)
+    dp.callback_query.register(backcall)
+    dp.message.register(sendfile, F.document)
     dp.message.register(get_comment, Comment.COMMENT)
     dp.message.register(get_start, Command('start'))
-    dp.message.register(edit_balance, Command('b', 'balance'), F.from_user.id==int(os.getenv('ADMIN_ID')))
-    dp.message.register(edit_status, Command('s', 'status'), F.from_user.id==int(os.getenv('ADMIN_ID')))
-    dp.message.register(sendfile, F.document)
-    dp.message.register(wannapay, F.text == '💳 Баланс')
-    dp.message.register(myfilelist, F.text == '📂 Мои файлы')
-    dp.message.register(listofusers, F.text == '💳 Баланс пользователей', F.from_user.id==int(os.getenv('ADMIN_ID')))
-    dp.message.register(fileinqueue, F.text == '🧭 Файлы в очереди', F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(help, Command('help'))
+    dp.message.register(about, Command('about'))
+    dp.message.register(edit_balance, Command('b'), F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(edit_status, Command('s'), F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(listofusers, F.text.startswith('💳'), F.from_user.id==int(os.getenv('ADMIN_ID')))
+    dp.message.register(fileinqueue, F.text.startswith('🧭'), F.from_user.id==int(os.getenv('ADMIN_ID')))
     dp.message.register(statusinfo, F.text == '🖨 Принтер', F.from_user.id==int(os.getenv('ADMIN_ID')))
-    dp.message.register(sendfileinfo, Command('help'))
-    dp.callback_query.register(backcall)
+    dp.message.register(wannapay, F.text.startswith('💳') | (F.text == '/balance'))
+    dp.message.register(myfilelist, F.text.startswith('📂') | (F.text == '/myfiles'))
+    dp.message.register(printer, F.text == '🖨')
     dp.message.register(echo)
+    dp.startup.register(start_bot)
+    dp.shutdown.register(stop_bot)
     try:
         await bot.delete_webhook(drop_pending_updates=True)
         await dp.start_polling(bot)

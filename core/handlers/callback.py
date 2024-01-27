@@ -3,8 +3,9 @@ from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaPhoto
-from core.keyboards.inline import pay_inline, cancel, cancelorprint, canceldelete, cancelordelete
-from core.data.sql import create_file, get_balance, edit_user_balance, get_fileinfo, edit_file_status, get_username
+from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton
+from core.keyboards.inline import pay_inline, cancel, cancelorprint, canceldelete, cancelordelete, statuschange
+from core.data.sql import create_file, create_user, get_balance, edit_user_balance, get_fileinfo, edit_file_status, get_username, get_all_files_in_status
 from core.util.statesform import Comment
 
 
@@ -17,9 +18,45 @@ async def get_comment(message: Message, bot:Bot, state: FSMContext):
 
 async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
     if call.data == 'cash':
+        file='AgACAgIAAxkDAAIH0GW0RdAGS-_opEpGi4j9XzVLZ710AALx2TEbZ7ahSYlTIm7KV97iAQADAgADbQADNAQ'
         text = '*Совет:*\n_Указывайте Ваш `@username` при оплате\.\nЭто ускорит обработку пополнения\._'
-        await call.message.edit_media(InputMediaPhoto(media = FSInputFile('core\\data\\files\\resources\\qr-code.jpg'),
+        msg = await call.message.edit_media(InputMediaPhoto(media = file,
                                         caption=text, parse_mode=ParseMode.MARKDOWN_V2), reply_markup=pay_inline)
+    
+    if call.data.startswith('statusfile:'):
+        status = call.data.split(':')[1]
+        list_files = InlineKeyboardBuilder()
+        files = await get_all_files_in_status(status)
+        if status == 'done': text1 = 'Напечатанные файлы'
+        if status == 'queue': text1 = 'Файлы в очереди'
+        if status == 'canceled': text1 = 'Отмененнные файлы'
+        if files == []:
+            await call.message.edit_text(f'<i>{text1} отсутсвуют.</i>', parse_mode=ParseMode.HTML, reply_markup=statuschange)
+        else:
+            for file in files:
+                unique_id, user_id, date, file_name = file
+                if len(f"{date} - {file_name} - @{await get_username(user_id)}") > 50:
+                    file_name = file_name[:15]+'...'
+                list_files.button(text=f"{date} | {file_name} | @{await get_username(user_id)}", callback_data=f"userfile:{unique_id}")
+            list_files.adjust(1)
+            list_files.row(
+                            InlineKeyboardButton
+                        (
+                            text='Готовые',
+                            callback_data=f"statusfile:done"
+                            ),
+                            InlineKeyboardButton
+                            (
+                            text='Ожидают',
+                            callback_data=f"statusfile:queue"
+                            ),
+                            InlineKeyboardButton
+                            (
+                            text='Отменены',
+                            callback_data=f"statusfile:canceled"
+                            )
+            )
+            await call.message.edit_text(f'<i>{text1}:</i>', reply_markup=list_files.as_markup(), parse_mode=ParseMode.HTML)
     
     if call.data.startswith('myfile:'):
         unique_id = call.data.split(':')[1]
@@ -142,6 +179,9 @@ async def backcall(call:CallbackQuery, bot:Bot, state: FSMContext):
         if call.data.startswith('newfile:accept:'):
             price = float(call.data.split(':')[2])
             balance = await get_balance(call.from_user.id)
+            if balance is None:
+                await create_user(call.from_user.id, call.from_user.username)
+                balance = 0.0
             if round(balance-price, 2) > 0:
                 await create_file(call.message.document.file_unique_id, 
                                   call.message.document.file_id, 
