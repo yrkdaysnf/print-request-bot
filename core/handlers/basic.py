@@ -22,7 +22,7 @@ async def get_start(message: Message, bot = Bot):
     file = 'AgACAgIAAxkDAAIHIGW0A_glqlaEbe3Pa8Tc-8Rez5YIAALv2TEbZ7ahSdb74hhD60KMAQADAgADcwADNAQ'
     text=f'''
 Здравствуйте, <i>{message.from_user.full_name}</i>!
-Добро пожаловать в систему автоматизирванной печати!
+Добро пожаловать в систему автоматизированной печати!
 Отправьте мне файлы или воспользуйтесь командами.
 
 <i><b>Список команд:</b></i>

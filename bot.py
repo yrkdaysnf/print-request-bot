@@ -8,7 +8,7 @@ from core.handlers.balance import listofusers, edit_balance
 from core.handlers.filelist import myfilelist, fileinqueue
 from core.handlers.status import edit_status, statusinfo
 from core.handlers.callback import backcall, get_comment
-from core.data.files.resources.info import help, about
+from core.handlers.info import help, about
 from core.handlers.files import sendfile
 from core.handlers.pay import wannapay
 
