@@ -72,4 +72,4 @@ cmdabout = f'''
 👤 <i>Создатель бота:</i> @yrkdaysnf
 '''
 async def about(message:Message):
-    await message.answer(cmdabout, ParseMode.HTML)
+    await message.answer(cmdabout, ParseMode.HTML, disable_web_page_preview=True)
