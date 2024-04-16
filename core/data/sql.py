@@ -40,6 +40,7 @@ async def create_user(user_id:int, username:str):
             cur.execute("UPDATE users SET username = ? WHERE user_id = ?", (username, user_id))
             db.commit()
     else:
+        print('New user!')
         cur.execute("INSERT INTO users (user_id, username) VALUES (?, ?)", (user_id, username))
         db.commit()
     db.close()

@@ -12,17 +12,14 @@ from core.handlers.info import help, about
 from core.handlers.files import sendfile
 from core.handlers.pay import wannapay
 
-
 ld()
 TOKEN = os.getenv('API_TOKEN')
-
 
 logging.basicConfig(level=logging.INFO, 
                     filename=f'core\\data\\files\\logs\\printbot_{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.log',
                     format='%(asctime)s - [%(levelname)s] - %(name)s - %(message)s')
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
-
 async def main():
     dp.callback_query.register(backcall)
     dp.message.register(sendfile, F.document)
@@ -46,6 +43,5 @@ async def main():
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
-
 if __name__ == '__main__':
     asyncio.run(main())
